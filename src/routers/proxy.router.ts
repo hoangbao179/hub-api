@@ -7,7 +7,7 @@ const router = express.Router();
 const proxyService = new ProxyService();  
 const proxyController = new ProxyController(proxyService); 
 
-router.post('/buy', proxyController.buyProxy);
+router.get('/buy', proxyController.buyProxy);
 router.get('/inventory', proxyController.getAmountInventory);
 
 export default router;
