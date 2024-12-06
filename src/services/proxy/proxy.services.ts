@@ -15,7 +15,7 @@ export class ProxyService implements IProxyService {
             key: process.env.API_KEY_SITE_BUY_PROXY,
             loaiproxy,
             soluong: quantity,
-            ngay: 1,
+            ngay: 30,
         };
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
         try {
