@@ -10,11 +10,11 @@ class ProxyController {
 
     buyProxy = async (req: Request, res: Response): Promise<any> => {
         try {
-            const { order_id, quantity } = req.query;
-            if (!order_id || !quantity) {
-                return res.status(400).json({ error: 'Missing required parameters: order_id, quantity' });
+            const { key, order_id, quantity } = req.query;
+            if (!key || !order_id || !quantity) {
+                return res.status(400).json({ error: 'Missing required parameters: key, order_id, quantity' });
             }
-            const result = await this.proxyService.buyProxy(Number(order_id), Number(quantity));
+            const result = await this.proxyService.buyProxy(key.toString(), order_id.toString(), Number(quantity));
             return res.status(200).json(result);
         } catch (error) {
             return res.status(500).json({ message: error });

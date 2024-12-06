@@ -5,8 +5,8 @@ import { IProxyService } from './iproxy.service';
 export class ProxyService implements IProxyService {
     private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/api/muaproxy.php`;
 
-    async buyProxy(orderId: number, quantity: number): Promise<any> {
-        const loaiproxy = ProxyTypeMapping[orderId];
+    async buyProxy(key: string, orderId: string, quantity: number): Promise<any> {
+        const loaiproxy = ProxyTypeMapping[key];
         if (!loaiproxy) {
             throw new Error('Invalid orderId provided');
         }
