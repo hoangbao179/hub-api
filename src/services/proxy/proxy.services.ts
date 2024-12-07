@@ -11,13 +11,7 @@ export class ProxyService implements IProxyService {
             throw new Error('Invalid orderId provided');
         }
 
-        const params = {
-            key: process.env.API_KEY_SITE_BUY_PROXY,
-            loaiproxy,
-            soluong: quantity,
-            ngay: 30,
-        };
-        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
             const response = await axios.post(fullUrl);
             const proxyList =  processProxyResponse(response.data);
