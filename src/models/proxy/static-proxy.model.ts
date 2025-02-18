@@ -1,4 +1,4 @@
-export interface IProxy {
+export interface IStaticProxy {
     status: number,
     loaiproxy: string,
     idproxy: number,

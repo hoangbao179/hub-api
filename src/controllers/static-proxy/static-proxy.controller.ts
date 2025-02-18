@@ -1,20 +1,20 @@
-import { IProxyService } from "../../services/proxy/iproxy.service";
+import { IStaticProxyService } from "../../services/proxy/istatic-proxy.service";
 import { Request, Response } from 'express';
 
-class ProxyController {
-    private proxyService: IProxyService;
+class StaticProxyController {
+    private proxyService: IStaticProxyService;
 
-    constructor(proxyService: IProxyService) {
+    constructor(proxyService: IStaticProxyService) {
         this.proxyService = proxyService;
     }
 
-    buyProxy = async (req: Request, res: Response): Promise<any> => {
+    buyStaticProxy = async (req: Request, res: Response): Promise<any> => {
         try {
             const { key, order_id, quantity } = req.query;
             if (!key || !order_id || !quantity) {
                 return res.status(400).json({ error: 'Missing required parameters: key, order_id, quantity' });
             }
-            const result = await this.proxyService.buyProxy(key.toString(), order_id.toString(), Number(quantity));
+            const result = await this.proxyService.buyStaticProxy(key.toString(), order_id.toString(), Number(quantity));
             return res.status(200).json(result);
         } catch (error) {
             return res.status(500).json({ message: error });
@@ -36,4 +36,4 @@ class ProxyController {
     };
 };
 
-export default ProxyController;
+export default StaticProxyController;

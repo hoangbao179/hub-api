@@ -1,17 +1,17 @@
 import axios from 'axios';
-import { ProxyTypeMapping } from '../../enums/proxy.enum';
-import { IProxyService } from './iproxy.service';
+import { StaticProxyTypeMapping } from '../../enums/proxy.enum';
+import { IStaticProxyService } from './istatic-proxy.service';
 
-export class ProxyService implements IProxyService {
+export class StaticProxyService implements IStaticProxyService {
     private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/api/muaproxy.php`;
 
-    async buyProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        const loaiproxy = ProxyTypeMapping[key];
+    async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
+        const loaiproxy = StaticProxyTypeMapping[key];
         if (!loaiproxy) {
             throw new Error('Invalid orderId provided');
         }
 
-        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
         try {
             const response = await axios.post(fullUrl);
             const proxyList =  processProxyResponse(response.data);

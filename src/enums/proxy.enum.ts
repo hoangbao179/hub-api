@@ -1,11 +1,11 @@
-export enum ProxyType {
+export enum StaticProxyType {
     Viettel = 1,
     Fpt = 2,
     Vnpt = 3,
     US = 4,
 }
 
-export const ProxyTypeMapping: Record<string, string> = {
+export const StaticProxyTypeMapping: Record<string, string> = {
     "2b1701e2-f6d4-4a29-82f0-7dcb0c820f53": "Viettel",
     "3c015121-6f5b-4c1b-9abe-4c18362dedd2": "FPT",
     "90438f46-835c-4e24-be9f-6564760d3490": "US",

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import proxyRouter from './proxy.router'; 
+import proxyRouter from './static-proxy.router'; 
 
 const router = Router();
 router.use('/proxy', proxyRouter);  
