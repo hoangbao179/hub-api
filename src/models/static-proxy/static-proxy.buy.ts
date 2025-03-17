@@ -1,9 +1,9 @@
-export interface BuyProxyRequest {
+export interface BuyStaticProxyRequest {
     orderId: number;
     quantity: number;
 }
 
-export interface ProxyResponse {
+export interface StaticProxyResponse {
     status: number;
     loaiproxy: string;
     idproxy: number;
