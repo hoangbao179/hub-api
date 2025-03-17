@@ -1,20 +1,20 @@
-import { IStaticProxyService } from "../../services/static-proxy/istatic-proxy.service";
+import { IRotatingProxyService } from "services/rotating-proxy/irotating-proxy.services";
 import { Request, Response } from 'express';
 
-class StaticProxyController {
-    private proxyService: IStaticProxyService;
+class RotatingProxyController {
+    private proxyService: IRotatingProxyService;
 
-    constructor(proxyService: IStaticProxyService) {
+    constructor(proxyService: IRotatingProxyService) {
         this.proxyService = proxyService;
     }
 
-    buyStaticProxy = async (req: Request, res: Response): Promise<any> => {
+    buyRotatingProxy = async (req: Request, res: Response): Promise<any> => {
         try {
             const { key, order_id, quantity } = req.query;
             if (!key || !order_id || !quantity) {
                 return res.status(400).json({ error: 'Missing required parameters: key, order_id, quantity' });
             }
-            const result = await this.proxyService.buyStaticProxy(key.toString(), order_id.toString(), Number(quantity));
+            const result = await this.proxyService.buyRotatingProxy(key.toString(), order_id.toString(), Number(quantity));
             return res.status(200).json(result);
         } catch (error) {
             return res.status(500).json({ message: error });
@@ -36,4 +36,4 @@ class StaticProxyController {
     };
 };
 
-export default StaticProxyController;
+export default RotatingProxyController;

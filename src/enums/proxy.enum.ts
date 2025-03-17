@@ -12,3 +12,9 @@ export const StaticProxyTypeMapping: Record<string, string> = {
     "c238ce00-9123-4428-8990-46eee8e3d2ff": "VNPT",
     "cac02a2b-8ef5-4052-ae7e-45bbe0ef5e23": "DatacenterB",
 };
+
+export const RotatingProxyTypeMapping: Record<string, string> = {
+    "34e177eb-becc-47a4-aaba-7c9a54552411": `${process.env.SITE_BUY_PROXY_ROTATING_DAY}`,
+    "af32e02a-594f-4681-8400-9603c84688da": `${process.env.SITE_BUY_PROXY_ROTATING_WEEK}`,
+    "4a1d65a0-1bf3-4044-afda-75c715ff8022": `${process.env.SITE_BUY_PROXY_ROTATING_MONTH}`,
+};

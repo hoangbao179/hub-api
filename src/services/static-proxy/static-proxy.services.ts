@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { ProxyTypeMapping } from '../../enums/proxy.enum';
-import { IProxyService } from './iproxy.service';
-import { Lead } from 'models/proxy/proxy.buy';
+import { StaticProxyTypeMapping } from '../../enums/proxy.enum';
+import { IStaticProxyService } from './istatic-proxy.service';
+import { Lead } from 'models/static-proxy/static-proxy.buy';
 
 export class StaticProxyService implements IStaticProxyService {
     private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/api/muaproxy.php`;
@@ -12,7 +12,7 @@ export class StaticProxyService implements IStaticProxyService {
             throw new Error('Invalid orderId provided');
         }
 
-        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
             const response = await axios.post(fullUrl);
             const proxyList =  processProxyResponse(response.data);

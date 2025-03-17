@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { StaticProxyService } from '../services/proxy/static-proxy.services';
+import { StaticProxyService } from '../services/static-proxy/static-proxy.services';
 import StaticProxyController from '../controllers/static-proxy/static-proxy.controller';
 
 const router = express.Router();
