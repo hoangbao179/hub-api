@@ -13,10 +13,10 @@ export class RotatingProxyService implements IRotatingProxyService {
         const siteLoadKeyRotatingProxy = `${process.env.SITE_GET_KEY_ROTATING_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}`
         try {
             // Gửi yêu cầu mua proxy
-            // const buyResponse = await axios.post(siteBuyRotatingProxy);
-            // if (!buyResponse.data || buyResponse.status !== 200) {
-            //     throw new Error(`Failed to buy rotating proxy: ${buyResponse.statusText}`);
-            // }
+            const buyResponse = await axios.post(siteBuyRotatingProxy);
+            if (!buyResponse.data || buyResponse.status !== 200) {
+                throw new Error(`Failed to buy rotating proxy: ${buyResponse.statusText}`);
+            }
 
             // Lấy danh sách key proxy
             const keyResponse = await axios.get(siteLoadKeyRotatingProxy);
