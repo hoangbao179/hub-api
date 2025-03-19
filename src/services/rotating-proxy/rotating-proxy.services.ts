@@ -57,30 +57,40 @@ export class RotatingProxyService implements IRotatingProxyService {
 
 }
 
-function processProxyResponse(responseString: string, quantity: number): any[] {
-    const result: any[] = [];
-    const jsonArrayString = `[${responseString.replace(/}\s*{/g, '},{')}]`;
+function processProxyResponse(responseString: any, quantity: number): any[] {
+    if (typeof responseString !== "string") {
+        console.error("Invalid responseString:", responseString);
+        return [];
+    }
+
+    // Tách từng object JSON từ chuỗi ban đầu
+    const matches = responseString.match(/{[^}]+}/g);
+    if (!matches) {
+        console.error("No valid JSON objects found");
+        return [];
+    }
+
+    // Chuyển thành JSON hợp lệ
+    const jsonArrayString = `[${matches.join(",")}]`;
+
     try {
         const jsonArray = JSON.parse(jsonArrayString);
 
         const sortedData = jsonArray
-            .filter((data) => data.status === 100 && data.keyxoay) 
+            .filter((data) => data.status === 100 && data.keyxoay)
             .map((data) => ({
                 product: data.keyxoay,
                 expired: data.expired,
             }))
-            .sort((a, b) => {
-                const timeA = convertToTimestamp(a.expired);
-                const timeB = convertToTimestamp(b.expired);
-                return timeB - timeA; 
-            })
-            .slice(0, quantity); 
-        return sortedData.map(({ product }) => ({ product })); 
+            .sort((a, b) => convertToTimestamp(b.expired) - convertToTimestamp(a.expired))
+            .slice(0, quantity);
+
+        return sortedData.map(({ product }) => ({ product }));
     } catch (error) {
         console.error("Error parsing response:", error.message);
     }
 
-    return result;
+    return [];
 }
 
 function convertToTimestamp(expired: string): number {
