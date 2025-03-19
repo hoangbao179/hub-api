@@ -17,7 +17,8 @@ export class RotatingProxyService implements IRotatingProxyService {
             if (!buyResponse.data || buyResponse.status !== 200) {
                 throw new Error(`Failed to buy rotating proxy: ${buyResponse.statusText}`);
             }
-
+            // Chờ 3 giây trước khi lấy danh sách proxy
+            await new Promise(resolve => setTimeout(resolve, 2000));
             // Lấy danh sách key proxy
             const keyResponse = await axios.get(siteLoadKeyRotatingProxy);
             if (!keyResponse.data || keyResponse.status !== 200) {
@@ -44,7 +45,7 @@ export class RotatingProxyService implements IRotatingProxyService {
     
             if (moneyOfUser && moneyOfUser.user_value) {
                 const amount = parseFloat(moneyOfUser.user_value.replace(" VNĐ", "").replace(/\./g, ""));
-                const quotient = Math.floor(amount / 14400);
+                const quotient = Math.floor(amount / 10000);
                 return Promise.resolve({ sum: quotient });
             }
 
