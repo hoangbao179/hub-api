@@ -28,7 +28,7 @@ export class RotatingProxyService implements IRotatingProxyService {
             };
             const response = await axios.post(this.urlBuy, requestData, { headers });
 
-            return formatProxyResponse(response);
+            return formatProxyResponse(response.data);
         } catch (error: any) {
             console.error('Error in buyRotatingProxy:', error.message);
             throw error;
@@ -62,7 +62,7 @@ export class RotatingProxyService implements IRotatingProxyService {
     }
 
     async getAmountInventory(): Promise<any> {
-        Promise.resolve({ sum: 22 });
+        return Promise.resolve({ sum: 22 });
     }
 
     async getInfoProxy(key: string, region?: string): Promise<ProxyRotatingModel | { error: string }> {

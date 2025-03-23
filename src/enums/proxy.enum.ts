@@ -15,9 +15,7 @@ export const StaticProxyTypeMapping: Record<string, string> = {
 
 export const RotatingProxyTypeMapping: Record<string, string> = {
     "34e177eb-becc-47a4-aaba-7c9a54552411": "CHANGE_PROXY_1_DAY",
-    "af32e02a-594f-4681-8400-9603c84688da": "CHANGE_PROXY_1_WEEK",
-    "4a1d65a0-1bf3-4044-afda-75c715ff8022": "CHANGE_PROXY_1_MONTH",
-    "4a1d65a0-1bf3-4044-afda-75c715ff8020": "CHANGE_PROXY_VIP_1_DAY",
-    "4a1d65a0-1bf3-4044-afda-75c715ff8042": "CHANGE_PROXY_VIP_1_WEEK",
-    "4a1d65a0-1bf3-4044-afda-45c715ff8022": "CHANGE_PROXY_VIP_1_MONTH",
+    "4a1d65a0-1bf3-4044-afda-75c715ff8022": "CHANGE_PROXY_1_WEEK",
+    "8b4bf9d4-38e7-420f-8e58-703691e36e2d": "CHANGE_PROXY_VIP_1_DAY",
+    "af32e02a-594f-4681-8400-9603c84688da": "CHANGE_PROXY_VIP_1_WEEK",
 };
