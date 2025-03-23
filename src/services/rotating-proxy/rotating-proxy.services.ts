@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { IRotatingProxyService } from './irotating-proxy.services';
 import { RotatingProxyTypeMapping } from '../../enums/proxy.enum';
-import { PackageProxy, PeriodPrice, ProxyRotatingModel, } from 'models/rotating-proxy/proxy-rotating.model';
+import { PackageProxy, PeriodPrice, ProxyRotatingError, ProxyRotatingModel, } from 'models/rotating-proxy/proxy-rotating.model';
 
 export class RotatingProxyService implements IRotatingProxyService {
     private readonly apiKey = `${process.env.API_KEY_PROXY_ROTATING}`;
@@ -65,7 +65,7 @@ export class RotatingProxyService implements IRotatingProxyService {
         Promise.resolve({ sum: 22 });
     }
 
-    async getInfoProxy(key: string, region?: string): Promise<ProxyRotatingModel | { success: boolean; message: string; error?: any }> {
+    async getInfoProxy(key: string, region?: string): Promise<ProxyRotatingModel | { error: string }> {
         try {
             let apiUrl = `${process.env.URL_GET_DATA_ROTATING_PROXY}=${key}`;
             if (region) apiUrl += `&region=${region}`;
@@ -90,11 +90,11 @@ export class RotatingProxyService implements IRotatingProxyService {
                 };
 
                 return proxyData;
-            } else {
-                return { success: false, message: 'Failed to fetch proxy data' };
             }
-        } catch (error) {
-            return { success: false, message: 'Error fetching proxy data', error };
+        } catch (error: any) {
+            return {
+                error: error.response?.data.message || "Proxy của bạn chưa đến thời gian đổi",
+            }; 
         }
     }
 }
