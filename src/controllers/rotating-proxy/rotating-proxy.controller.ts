@@ -34,6 +34,21 @@ class RotatingProxyController {
             return res.status(500).json({ message: 'Internal Server Error' });
         }
     };
+
+    getInfoProxy = async (req: Request, res: Response): Promise<any> =>{
+        try {
+            const { key, region } = req.query;
+
+            if (!key) {
+                return res.status(400).json({ message: 'Missing required "key" parameter' });
+            }
+    
+            const result = await this.proxyService.getInfoProxy(key, region);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ message: 'Internal server error', error });
+        }
+    };
 };
 
 export default RotatingProxyController;

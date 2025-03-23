@@ -7,12 +7,12 @@ export class StaticProxyService implements IStaticProxyService {
     private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/api/muaproxy.php`;
 
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        const loaiproxy = StaticProxyTypeMapping[key];
-        if (!loaiproxy) {
+        const proxyType = StaticProxyTypeMapping[key];
+        if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
 
-        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(loaiproxy)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
             const response = await axios.post(fullUrl);
             const proxyList =  processProxyResponse(response.data);
