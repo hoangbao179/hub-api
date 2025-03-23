@@ -1,102 +1,109 @@
 import axios from 'axios';
 import { IRotatingProxyService } from './irotating-proxy.services';
 import { RotatingProxyTypeMapping } from '../../enums/proxy.enum';
-import { Lead } from '../../models/static-proxy/static-proxy.buy';
+import { PackageProxy, PeriodPrice, ProxyRotatingModel, } from 'models/rotating-proxy/proxy-rotating.model';
 
 export class RotatingProxyService implements IRotatingProxyService {
+    private readonly apiKey = `${process.env.API_KEY_PROXY_ROTATING}`;
+    private readonly urlBuy = `${process.env.URL_BUY_PROXY_ROTATING}`;
+    private readonly urlGetPackage = `${process.env.URL_GET_PACKAGE_ROTATING_PROXY}`;
     async buyRotatingProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        const baseUrl = RotatingProxyTypeMapping[key];
-        if (!baseUrl) {
+        const proxyType = RotatingProxyTypeMapping[key];
+        if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
-        const siteBuyRotatingProxy = `${baseUrl}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&soluong=${encodeURIComponent(quantity)}&thoigian=${encodeURIComponent(1)}`;
-        const siteLoadKeyRotatingProxy = `${process.env.SITE_GET_KEY_ROTATING_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}`
+
+        let packageProxy = await this.getPeriodPriceByCode(proxyType);
         try {
-            // Gửi yêu cầu mua proxy
-            const buyResponse = await axios.post(siteBuyRotatingProxy);
-            if (!buyResponse.data || buyResponse.status !== 200) {
-                throw new Error(`Failed to buy rotating proxy: ${buyResponse.statusText}`);
-            }
-            // Chờ 3 giây trước khi lấy danh sách proxy
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            // Lấy danh sách key proxy
-            const keyResponse = await axios.get(siteLoadKeyRotatingProxy);
-            if (!keyResponse.data || keyResponse.status !== 200) {
-                throw new Error(`Failed to fetch proxy keys: ${keyResponse.statusText}`);
-            }
+            const requestData = {
+                quantity: quantity,
+                numberOfPeriods: packageProxy.priority,
+                packageId: packageProxy.periodPrice.packageId,
+                packagePeriodId: packageProxy.periodPrice.id
+            };
 
-            // Xử lý danh sách proxy
-            const proxyList = processProxyResponse(keyResponse.data, quantity);
+            const headers = {
+                'api-token': this.apiKey,
+                'Content-Type': 'application/json'
+            };
+            const response = await axios.post(this.urlBuy, requestData, { headers });
 
-            return proxyList;
+            return formatProxyResponse(response);
         } catch (error: any) {
-            console.error(`Error fetching rotating proxy: ${error.message}`);
-            throw new Error(`Error calling proxy API: ${error.message}`);
+            console.error('Error in buyRotatingProxy:', error.message);
+            throw error;
+        }
+    }
+
+    async fetchPackages(): Promise<PackageProxy[]> {
+        try {
+            const response = await axios.get<{ data: PackageProxy[] }>(this.urlGetPackage);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error fetching packages:', error);
+            throw new Error('Cannot fetch packages');
+        }
+    }
+
+    async getPeriodPriceByCode(code: string): Promise<{ periodPrice: PeriodPrice, priority: number } | null> {
+        try {
+            const packages = await this.fetchPackages();
+            for (const pkg of packages) {
+                const periodPrice = pkg.periodPrices.find(pp => pp.code === code);
+                if (periodPrice) {
+                    return { periodPrice, priority: pkg.priority };
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error('Error fetching period price by code:', error);
+            return null;
         }
     }
 
     async getAmountInventory(): Promise<any> {
-        const userInfoUrl = `${process.env.API_GET_INFO_USER}`;
-    
-        try {
-            const response = await axios.get<Lead>(userInfoUrl); 
-            const data: Lead = response.data;
-            const moneyOfUser = data.attributes?.find((attr) => attr.key === "tienweb");
-    
-            if (moneyOfUser && moneyOfUser.user_value) {
-                const amount = parseFloat(moneyOfUser.user_value.replace(" VNĐ", "").replace(/\./g, ""));
-                const quotient = Math.floor(amount / 10000);
-                return Promise.resolve({ sum: quotient });
-            }
+        Promise.resolve({ sum: 22 });
+    }
 
-            return Promise.resolve({ sum: 22 });
+    async getInfoProxy(key: string, region?: string): Promise<ProxyRotatingModel | { success: boolean; message: string; error?: any }> {
+        try {
+            let apiUrl = `${process.env.URL_GET_DATA_ROTATING_PROXY}=${key}`;
+            if (region) apiUrl += `&region=${region}`;
+
+            const response = await axios.get(apiUrl);
+
+            if (response.data.success) {
+                const rawData = response.data.data;
+
+                const proxyData: ProxyRotatingModel = {
+                    realIpAddress: rawData.realIpAddress,
+                    http: rawData.http,
+                    socks5: rawData.socks5,
+                    nextRequestAt: new Date(rawData.nextRequestAt),
+                    httpPort: rawData.httpPort,
+                    socks5Port: rawData.socks5Port,
+                    host: rawData.host,
+                    location: rawData.location,
+                    expirationAt: new Date(rawData.expirationAt),
+                    ttl: rawData.ttl,
+                    ttc: rawData.ttc,
+                };
+
+                return proxyData;
+            } else {
+                return { success: false, message: 'Failed to fetch proxy data' };
+            }
         } catch (error) {
-            console.error("API call error:", error);
-            return Promise.resolve({ sum: 22 });
+            return { success: false, message: 'Error fetching proxy data', error };
         }
     }
-
 }
 
-function processProxyResponse(responseString: any, quantity: number): any[] {
-    if (typeof responseString !== "string") {
-        console.error("Invalid responseString:", responseString);
+function formatProxyResponse(apiResponse) {
+    if (!apiResponse || !apiResponse.data) {
         return [];
     }
-
-    // Tách từng object JSON từ chuỗi ban đầu
-    const matches = responseString.match(/{[^}]+}/g);
-    if (!matches) {
-        console.error("No valid JSON objects found");
-        return [];
-    }
-
-    // Chuyển thành JSON hợp lệ
-    const jsonArrayString = `[${matches.join(",")}]`;
-
-    try {
-        const jsonArray = JSON.parse(jsonArrayString);
-
-        const sortedData = jsonArray
-            .filter((data) => data.status === 100 && data.keyxoay)
-            .map((data) => ({
-                product: data.keyxoay,
-                expired: data.expired,
-            }))
-            .sort((a, b) => convertToTimestamp(b.expired) - convertToTimestamp(a.expired))
-            .slice(0, quantity);
-
-        return sortedData.map(({ product }) => ({ product }));
-    } catch (error) {
-        console.error("Error parsing response:", error.message);
-    }
-
-    return [];
-}
-
-function convertToTimestamp(expired: string): number {
-    const [time, date] = expired.split(" "); // Tách "14:59 18-03-25" thành ["14:59", "18-03-25"]
-    const [hours, minutes] = time.split(":").map(Number);
-    const [day, month, year] = date.split("-").map(Number);
-    return new Date(2000 + year, month - 1, day, hours, minutes).getTime();
+    return apiResponse.data.map(item => ({
+        product: item.value || 'Unknown Product',
+    }));
 }
