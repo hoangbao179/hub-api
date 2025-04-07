@@ -23,24 +23,25 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async getAmountInventory(): Promise<any> {
-        const userInfoUrl = `${process.env.API_GET_INFO_USER}`;
+        // const userInfoUrl = `${process.env.API_GET_INFO_USER}`;
     
-        try {
-            const response = await axios.get<Lead>(userInfoUrl); 
-            const data: Lead = response.data;
-            const moneyOfUser = data.attributes?.find((attr) => attr.key === "tienweb");
+        // try {
+        //     const response = await axios.get<Lead>(userInfoUrl); 
+        //     const data: Lead = response.data;
+        //     const moneyOfUser = data.attributes?.find((attr) => attr.key === "tienweb");
     
-            if (moneyOfUser && moneyOfUser.user_value) {
-                const amount = parseFloat(moneyOfUser.user_value.replace(" VNĐ", "").replace(/\./g, ""));
-                const quotient = Math.floor(amount / 14400);
-                return Promise.resolve({ sum: quotient });
-            }
+        //     if (moneyOfUser && moneyOfUser.user_value) {
+        //         const amount = parseFloat(moneyOfUser.user_value.replace(" VNĐ", "").replace(/\./g, ""));
+        //         const quotient = Math.floor(amount / 14400);
+        //         return Promise.resolve({ sum: quotient });
+        //     }
 
-            return Promise.resolve({ sum: 22 });
-        } catch (error) {
-            console.error("API call error:", error);
-            return Promise.resolve({ sum: 22 });
-        }
+        //     return Promise.resolve({ sum: 22 });
+        // } catch (error) {
+        //     console.error("API call error:", error);
+        //     return Promise.resolve({ sum: 22 });
+        // }
+        return Promise.resolve({ sum: 23 });
     }
 }
 
