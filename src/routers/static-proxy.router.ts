@@ -9,5 +9,6 @@ const staticProxyController = new StaticProxyController(proxyService);
 
 router.get('/buy', staticProxyController.buyStaticProxy);
 router.get('/inventory', staticProxyController.getAmountInventory);
-
+router.get('/buy-ipv6', staticProxyController.buyStaticProxyV6);
+router.get('/inventory-ipv6', staticProxyController.getAmountInventoryV6);
 export default router;
