@@ -52,10 +52,7 @@ export class StaticProxyService implements IStaticProxyService {
             throw new Error('Invalid orderId provided');
         }
         
-        if(proxyType == "RANDOM"){
-
-        }
-        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
             const response = await axios.post(fullUrl);
             const proxyList =  processProxyResponse(response.data);
