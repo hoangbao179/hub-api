@@ -42,8 +42,33 @@ export class StaticProxyService implements IStaticProxyService {
         //     console.error("API call error:", error);
         //     return Promise.resolve({ sum: 22 });
         // }
-        return Promise.resolve({ sum: 23 });
+        return Promise.resolve({ sum: 70 });
     }
+
+
+    async buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<any> {
+        const proxyType = StaticProxyTypeMapping[key];
+        if (!proxyType) {
+            throw new Error('Invalid orderId provided');
+        }
+        
+        if(proxyType == "RANDOM"){
+
+        }
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
+        try {
+            const response = await axios.post(fullUrl);
+            const proxyList =  processProxyResponse(response.data);
+            return proxyList;
+        } catch (error) {
+            throw new Error(`Error calling proxy API: }`);
+        }
+    }
+
+    async getAmountInventorySocks5(): Promise<any> {
+        return Promise.resolve({ sum: 70 });
+    }
+
 
     async buyStaticProxyV6(key: string, orderId: string, quantity: number): Promise<any> {
         const proxyType = StaticProxyTypeMapping[key];
