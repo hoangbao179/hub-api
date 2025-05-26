@@ -62,7 +62,7 @@ class StaticProxyController {
         }
     };
 
-        buyStaticProxySocks5 = async (req: Request, res: Response): Promise<any> => {
+    buyStaticProxySocks5 = async (req: Request, res: Response): Promise<any> => {
         try {
             const { key, order_id, quantity } = req.query;
             if (!key || !order_id || !quantity) {
