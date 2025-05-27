@@ -1,26 +1,38 @@
 import axios from 'axios';
 import { StaticProxyTypeMapping } from '../../enums/proxy.enum';
 import { IStaticProxyService } from './istatic-proxy.service';
-import { Lead } from 'models/static-proxy/static-proxy.buy';
-import { IStaticProxy } from 'models/static-proxy/static-proxy.model';
+import { PurchaseNotifierInterface } from '../notification/inotifyPurchase';
+import { PurchaseNotifier } from '../notification/notifyPurchase';
 
 export class StaticProxyService implements IStaticProxyService {
     private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/api/muaproxy.php`;
     private readonly BASE_URL_V6 = `${process.env.SITE_BUY_PROXY}/ipv6/apimuaipv6.php`;
+
+    private readonly notifier: PurchaseNotifierInterface;
+    
+    constructor() {
+        this.notifier = new PurchaseNotifier();
+    }
+
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
         const proxyType = StaticProxyTypeMapping[key];
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
 
-        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
         try {
             const response = await axios.post(fullUrl);
             const proxyList =  processProxyResponse(response.data);
+                // Gửi thông báo sau 30 giây, không chờ
+                // setTimeout(() => {
+                    // this.notifier.notifyPurchase().catch(err => console.error('Lỗi gửi thông báo:', err));
+                // }, 30000);
             return proxyList;
         } catch (error) {
-            throw new Error(`Error calling proxy API: }`);
+            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
         }
+
     }
 
     async getAmountInventory(): Promise<any> {
@@ -45,20 +57,23 @@ export class StaticProxyService implements IStaticProxyService {
         return Promise.resolve({ sum: 70 });
     }
 
-
     async buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<any> {
         const proxyType = StaticProxyTypeMapping[key];
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
         
-        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
+        const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
         try {
             const response = await axios.post(fullUrl);
             const proxyList =  processProxyResponse(response.data);
+                // Gửi thông báo sau 30 giây, không chờ
+                // setTimeout(() => {
+                //     this.notifier.notifyPurchase().catch(err => console.error('Lỗi gửi thông báo:', err));
+                // }, 30000);
             return proxyList;
         } catch (error) {
-            throw new Error(`Error calling proxy API: }`);
+            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
         }
     }
 

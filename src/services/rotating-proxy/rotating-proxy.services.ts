@@ -1,12 +1,20 @@
 import axios from 'axios';
 import { IRotatingProxyService } from './irotating-proxy.services';
 import { RotatingProxyTypeMapping } from '../../enums/proxy.enum';
-import { PackageProxy, PeriodPrice, ProxyRotatingError, ProxyRotatingModel, } from 'models/rotating-proxy/proxy-rotating.model';
+import { PackageProxy, PeriodPrice, ProxyRotatingModel, } from 'models/rotating-proxy/proxy-rotating.model';
+import { PurchaseNotifierInterface } from '../notification/inotifyPurchase';
+import { PurchaseNotifier } from '../notification/notifyPurchase';
 
 export class RotatingProxyService implements IRotatingProxyService {
     private readonly apiKey = `${process.env.API_KEY_PROXY_ROTATING}`;
     private readonly urlBuy = `${process.env.URL_BUY_PROXY_ROTATING}`;
     private readonly urlGetPackage = `${process.env.URL_GET_PACKAGE_ROTATING_PROXY}`;
+    private readonly notifier: PurchaseNotifierInterface;
+    
+    constructor() {
+        this.notifier = new PurchaseNotifier();
+    }
+
     async buyRotatingProxy(key: string, orderId: string, quantity: number): Promise<any> {
         const proxyType = RotatingProxyTypeMapping[key];
         if (!proxyType) {
@@ -27,11 +35,13 @@ export class RotatingProxyService implements IRotatingProxyService {
                 'Content-Type': 'application/json'
             };
             const response = await axios.post(this.urlBuy, requestData, { headers });
-
+            // Gửi thông báo sau 30 giây, không chờ
+                // setTimeout(() => {
+                //     this.notifier.notifyPurchase().catch(err => console.error('Lỗi gửi thông báo:', err));
+                // }, 30000);
             return formatProxyResponse(response.data);
         } catch (error: any) {
-            console.error('Error in buyRotatingProxy:', error.message);
-            throw error;
+             return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
         }
     }
 
