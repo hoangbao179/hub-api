@@ -77,7 +77,7 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async getAmountInventorySocks5(): Promise<any> {
-        return Promise.resolve({ sum: 70 });
+        return Promise.resolve({ sum: 135 });
     }
 
 
