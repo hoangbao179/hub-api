@@ -19,7 +19,6 @@ export class StaticProxyService implements IStaticProxyService {
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
-
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
             const response = await axios.post(fullUrl);
@@ -179,4 +178,22 @@ function processProxyResponseV6(data: string): { product: string }[] {
     }
 
     return result;
+}
+
+function randomProxy() {
+  const ip = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256)).join('.');
+  const port = Math.floor(Math.random() * (65535 - 1000 + 1)) + 1000;
+  const randomString = (length) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  };
+  const username = randomString(6);
+  const password = randomString(6);
+  return `${ip}:${port}:${username}:${password}`;
+}
+
+function generateProxies(quantity) {
+  return Array.from({ length: quantity }, () => ({
+    product: randomProxy()
+  }));
 }

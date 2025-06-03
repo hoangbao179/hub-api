@@ -117,3 +117,17 @@ function formatProxyResponse(apiResponse) {
         product: item.value || 'Unknown Product',
     }));
 }
+
+function randomRotatingProxy() {
+  const prefix = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Random A-Z
+  const hexPart = [...Array(32)].map(() =>
+    Math.floor(Math.random() * 16).toString(16)
+  ).join('');
+  return prefix + hexPart;
+}
+
+function generateProxies(quantity) {
+  return Array.from({ length: quantity }, () => ({
+    product: randomRotatingProxy()
+  }));
+}
