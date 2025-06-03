@@ -23,7 +23,6 @@ export class GmailService implements IGmailService {
             const newOrderId = buyResponse.data.order_id;
 
             // chưa xử lý được vụ call api xem còn bao nhiêu tiền nên tạm thời chưa xử lý 
-
             // Hàm thử lấy sản phẩm với retry
             const fetchProducts = async (attempt = 1): Promise<any> => {
                 const getUrl = `${this.apiBaseUrl}/getProducts?orderId=${newOrderId}&userToken=${this.userToken}`;

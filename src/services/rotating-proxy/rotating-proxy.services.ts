@@ -25,7 +25,7 @@ export class RotatingProxyService implements IRotatingProxyService {
         try {
             const requestData = {
                 quantity: quantity,
-                numberOfPeriods: packageProxy.priority,
+                numberOfPeriods: 1,
                 packageId: packageProxy.periodPrice.packageId,
                 packagePeriodId: packageProxy.periodPrice.id
             };
