@@ -17,7 +17,8 @@ export const StaticProxyTypeMapping: Record<string, string> = {
     "c238ce00-9123-4428-8990-46eee8e3d2ff": "VNPT",
     "5acc02b2-c068-4d70-9b3c-1af5bcbdb688": "VNPT",
     "aa8884d8-1592-4ff3-bb16-7f2e752dce9e": "US",
-    "fb73eaf1-77aa-44eb-8a14-b0bd8fadacfc": "US"
+    "fb73eaf1-77aa-44eb-8a14-b0bd8fadacfc": "US",
+    "bd9bcbab-0403-4806-bc31-4a809cfddb56": "DatacenterC" 
 };
 
 export const RotatingProxyTypeMapping: Record<string, string> = {
