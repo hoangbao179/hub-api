@@ -1,17 +1,26 @@
 import axios from 'axios';
 import { StaticProxyTypeMapping } from '../../enums/proxy.enum';
 import { IStaticProxyService } from './istatic-proxy.service';
-import { PurchaseNotifierInterface } from '../notification/inotifyPurchase';
-import { PurchaseNotifier } from '../notification/notifyPurchase';
+import { HttpsProxyAgent } from 'https-proxy-agent/dist';
 
 export class StaticProxyService implements IStaticProxyService {
     private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/api/muaproxy.php`;
     private readonly BASE_URL_V6 = `${process.env.SITE_BUY_PROXY}/ipv6/apimuaipv6.php`;
 
-    private readonly notifier: PurchaseNotifierInterface;
-    
+    private readonly proxyAgent: HttpsProxyAgent<string>;
+
     constructor() {
-        this.notifier = new PurchaseNotifier();
+        const proxyString = process.env.PROXY_VN_CALL_API;
+        if (!proxyString) {
+            throw new Error('Biến môi trường PROXY_VN_CALL_API không được định nghĩa');
+        }
+        // Tách proxyString thành host, port, user, pass
+        const [host, port, user, pass] = proxyString.split(':');
+        if (!host || !port || !user || !pass) {
+            throw new Error('Định dạng PROXY_VN_CALL_API không đúng, phải là host:port:user:pass');
+        }
+        const proxyUrl = `http://${user}:${pass}@${host}:${port}`;
+        this.proxyAgent = new HttpsProxyAgent<string>(proxyUrl);
     }
 
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
@@ -20,18 +29,15 @@ export class StaticProxyService implements IStaticProxyService {
             throw new Error('Invalid orderId provided');
         }
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
+        
         try {
-            const response = await axios.post(fullUrl);
-            const proxyList =  processProxyResponse(response.data);
-                // Gửi thông báo sau 30 giây, không chờ
-                // setTimeout(() => {
-                    // this.notifier.notifyPurchase().catch(err => console.error('Lỗi gửi thông báo:', err));
-                // }, 30000);
+            const response = await axios.get(fullUrl, { httpsAgent: this.proxyAgent });
+            const proxyList = processProxyResponse(response.data);
             return proxyList;
         } catch (error) {
-            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
+            console.log("Lỗi:", error.message);
+            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call API lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
         }
-
     }
 
     async getAmountInventory(): Promise<any> {
@@ -64,7 +70,7 @@ export class StaticProxyService implements IStaticProxyService {
         
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
-            const response = await axios.post(fullUrl);
+            const response = await axios.get(fullUrl, { httpsAgent: this.proxyAgent });
             const proxyList =  processProxyResponse(response.data);
                 // Gửi thông báo sau 30 giây, không chờ
                 // setTimeout(() => {
@@ -89,7 +95,7 @@ export class StaticProxyService implements IStaticProxyService {
 
         const fullUrl = `${this.BASE_URL_V6}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
-            const response = await axios.post(fullUrl);
+            const response = await axios.post(fullUrl, {}, { httpsAgent: this.proxyAgent });
             const proxyList =  processProxyResponseV6(response.data);
             return proxyList;
         } catch (error) {
