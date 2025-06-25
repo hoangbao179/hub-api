@@ -24,9 +24,6 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        if( key == "a46038ad-279f-46e1-a33e-1f0338ffbdc4"){
-            return generateProxies(quantity);
-        }
         const proxyType = StaticProxyTypeMapping[key];
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
