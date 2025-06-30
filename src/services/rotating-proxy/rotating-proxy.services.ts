@@ -72,7 +72,7 @@ export class RotatingProxyService implements IRotatingProxyService {
     }
 
     async getAmountInventory(): Promise<any> {
-        return Promise.resolve({ sum: 168 });
+        return Promise.resolve({ sum: 458 });
     }
 
     async getInfoProxy(key: string, region?: string): Promise<ProxyRotatingModel | { error: string }> {

@@ -59,7 +59,7 @@ export class StaticProxyService implements IStaticProxyService {
         //     console.error("API call error:", error);
         //     return Promise.resolve({ sum: 22 });
         // }
-        return Promise.resolve({ sum: 70 });
+        return Promise.resolve({ sum: 270 });
     }
 
     async buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<any> {
@@ -83,7 +83,7 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async getAmountInventorySocks5(): Promise<any> {
-        return Promise.resolve({ sum: 135 });
+        return Promise.resolve({ sum: 335 });
     }
 
 
