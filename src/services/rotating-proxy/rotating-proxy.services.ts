@@ -16,6 +16,9 @@ export class RotatingProxyService implements IRotatingProxyService {
     }
 
     async buyRotatingProxy(key: string, orderId: string, quantity: number): Promise<any> {
+        if( quantity > 9){
+            return Array(quantity).fill({ product: `Đơn hàng: ${orderId} đang order hơn 10 key, liên hệ shop hoặc tele: hateno17 để cấp key` });
+        }
         const proxyType = RotatingProxyTypeMapping[key];
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
