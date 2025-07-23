@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "axios": "^1.7.7",
+    "axios": "^1.11.0",
     "express": "^4.21.1",
-    "googleapis": "^154.0.0",
-    "https-proxy-agent": "^7.0.6"
+    "https-proxy-agent": "^7.0.6",
+    "jsonwebtoken": "^9.0.2"
   },
   "scripts": {
     "start": "ts-node src/app.ts",
