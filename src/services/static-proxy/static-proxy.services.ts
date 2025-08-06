@@ -24,8 +24,8 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        if( quantity > 9){
-            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} đang order hơn 10 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+        if( quantity > 5){
+            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
         }
 
         const proxyType = StaticProxyTypeMapping[key];
@@ -67,8 +67,8 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<any> {
-        if( quantity > 9){
-            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} đang order hơn 10 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+        if( quantity > 5){
+            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
         }
         const proxyType = StaticProxyTypeMapping[key];
         if (!proxyType) {
