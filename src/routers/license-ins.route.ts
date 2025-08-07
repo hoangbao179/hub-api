@@ -1,6 +1,6 @@
 // routes/license.route.ts
 import { Router } from "express";
-import LicenseController from "../controllers/license-ins/license-ins.controller";
+import LicenseController from "../controllers/license/license-ins.controller";
 
 const router = Router();
 
