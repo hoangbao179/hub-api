@@ -32,6 +32,10 @@ export class StaticProxyService implements IStaticProxyService {
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
+
+        if( proxyType == "US" && quantity > 2){
+              return Array(quantity).fill({ product: `Đơn hàng: ${orderId} đang có lỗi vui lòng liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+        }
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         
         try {
@@ -74,6 +78,10 @@ export class StaticProxyService implements IStaticProxyService {
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
+
+        if(proxyType == "US" && quantity > 2){
+              return Array(quantity).fill({ product: `Đơn hàng: ${orderId} đang có lỗi vui lòng liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+        }
         
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
@@ -92,7 +100,6 @@ export class StaticProxyService implements IStaticProxyService {
     async getAmountInventorySocks5(): Promise<any> {
         return Promise.resolve({ sum: 335 });
     }
-
 
     async buyStaticProxyV6(key: string, orderId: string, quantity: number): Promise<any> {
         const proxyType = StaticProxyTypeMapping[key];
