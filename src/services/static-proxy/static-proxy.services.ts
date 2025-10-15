@@ -4,8 +4,9 @@ import { IStaticProxyService } from './istatic-proxy.service';
 import { HttpsProxyAgent } from 'https-proxy-agent/dist';
 
 export class StaticProxyService implements IStaticProxyService {
-    private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/api/muaproxy.php`;
+    private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/apiv2/muaproxy.php`;
     private readonly BASE_URL_V6 = `${process.env.SITE_BUY_PROXY}/ipv6/apimuaipv6.php`;
+
 
     private readonly proxyAgent: HttpsProxyAgent<string>;
 
@@ -123,43 +124,39 @@ export class StaticProxyService implements IStaticProxyService {
     }
 }
 
-function processProxyResponse(responseString: string): any[] {
+
+function processProxyResponse(responseData: any): any[] {
     const result: any[] = [];
-    const responseParts = responseString.split('}{').map((part, index, array) => {
-        if (index === 0) {
-            return part + '}'; 
-        } else if (index === array.length - 1) {
-            return '{' + part; 
-        }
-        return '{' + part + '}'; 
-    });
 
-    for (const part of responseParts) {
-        try {
-            const data = JSON.parse(part); 
-            if (data.status === 200) {
-                return result;
+    // Nếu là string, parse JSON
+    const dataArray =
+        typeof responseData === "string"
+            ? JSON.parse(responseData)
+            : responseData;
+
+    if (!Array.isArray(dataArray)) {
+        throw new Error("Invalid response format: expected an array");
+    }
+
+    for (const data of dataArray) {
+        if (data.status === 100 && data.proxy) {
+            const proxyParts = data.proxy.split(":");
+
+            if (proxyParts.length === 4) {
+                const [ip, port, user, password] = proxyParts;
+                const product = `${ip}:${port}:${user}:${password}`;
+                result.push({ product });
+            } else {
+                console.warn("Invalid proxy format:", data.proxy);
             }
-
-            if (data.status === 100) {
-                const { proxy } = data;
-                const proxyParts = proxy.split(':');
-
-                if (proxyParts.length === 4) {
-                    const [ip, port, user, password] = proxyParts;
-                    const product = `${ip}:${port}:${user}:${password}`; 
-                    result.push({ product });
-                } else {
-                    throw new Error("Invalid proxy format.");
-                }
-            }
-        } catch (error) {
-            console.error("Error parsing response:", error.message);
+        } else if (data.status === 200) {
+            break; // kết thúc khi gặp status 200
         }
     }
 
     return result;
 }
+
 
 
 function processProxyResponseV6(data: string): { product: string }[] {
