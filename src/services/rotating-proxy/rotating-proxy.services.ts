@@ -10,13 +10,16 @@ export class RotatingProxyService implements IRotatingProxyService {
     private readonly urlBuy = `${process.env.URL_BUY_PROXY_ROTATING}`;
     private readonly urlGetPackage = `${process.env.URL_GET_PACKAGE_ROTATING_PROXY}`;
     private readonly notifier: PurchaseNotifierInterface;
-    
+
     constructor() {
         this.notifier = new PurchaseNotifier();
     }
 
     async buyRotatingProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        if( quantity > 9){
+        if (quantity > 9) {
+            this.notifier.notifyPurchase(true, orderId, quantity, "info").catch(err =>
+                console.error('Lỗi gửi thông báo info:', err)
+            );
             return Array(quantity).fill({ product: `Đơn hàng: ${orderId} đang order hơn 10 key, liên hệ shop hoặc tele: hateno17 để cấp key` });
         }
 
@@ -39,13 +42,15 @@ export class RotatingProxyService implements IRotatingProxyService {
                 'Content-Type': 'application/json'
             };
             const response = await axios.post(this.urlBuy, requestData, { headers });
-            // Gửi thông báo sau 30 giây, không chờ
-                // setTimeout(() => {
-                //     this.notifier.notifyPurchase().catch(err => console.error('Lỗi gửi thông báo:', err));
-                // }, 30000);
+            this.notifier.notifyPurchase(true, orderId, quantity, "success").catch(err =>
+                console.error('Lỗi gửi thông báo info:', err)
+            );
             return formatProxyResponse(response.data);
         } catch (error: any) {
-             return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
+            this.notifier.notifyPurchase(true, orderId, quantity, "error", error).catch(err =>
+                console.error('Lỗi gửi thông báo info:', err)
+            );
+            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
         }
     }
 
@@ -108,7 +113,7 @@ export class RotatingProxyService implements IRotatingProxyService {
         } catch (error: any) {
             return {
                 error: error.response?.data.message || "Proxy của bạn chưa đến thời gian đổi",
-            }; 
+            };
         }
     }
 }
@@ -123,15 +128,15 @@ function formatProxyResponse(apiResponse) {
 }
 
 function randomRotatingProxy() {
-  const prefix = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Random A-Z
-  const hexPart = [...Array(32)].map(() =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join('');
-  return prefix + hexPart;
+    const prefix = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Random A-Z
+    const hexPart = [...Array(32)].map(() =>
+        Math.floor(Math.random() * 16).toString(16)
+    ).join('');
+    return prefix + hexPart;
 }
 
 function generateProxies(quantity) {
-  return Array.from({ length: quantity }, () => ({
-    product: randomRotatingProxy()
-  }));
+    return Array.from({ length: quantity }, () => ({
+        product: randomRotatingProxy()
+    }));
 }

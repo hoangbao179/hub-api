@@ -16,43 +16,89 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
   private telegramNotifier: TelegramNotification;
 
   constructor() {
-    this.apiGetInfoUser = process.env.API_GET_INFO_USER;
-    this.apiUserWebRotatingProxy = process.env.API_USER_WEB_ROTATING_PROXY;
+    this.apiGetInfoUser = process.env.API_GET_INFO_USER || '';
+    this.apiUserWebRotatingProxy = process.env.API_USER_WEB_ROTATING_PROXY || '';
     this.telegramNotifier = new TelegramNotifier();
   }
 
-  async notifyPurchase(): Promise<void> {
+  /**
+   * Gửi thông báo mua hàng qua Telegram
+   */
+  async notifyPurchase(
+    isRotating: boolean,
+    orderId: string,
+    quantity: number,
+    status: 'success' | 'error' | 'info' | string,
+    errorMessage?: any
+  ): Promise<void> {
     let amountA: number | null = null;
     let amountB: number | null = null;
 
-    // Gọi Web A
+    // Lấy số dư Web A
     try {
       const resA: AxiosResponse<UserDataA> = await axios.get(this.apiGetInfoUser);
       const moneyOfUser = resA.data.attributes?.find(attr => attr.key === 'tienweb');
       if (moneyOfUser?.user_value) {
-        amountA = parseFloat(moneyOfUser.user_value.replace(" VNĐ", "").replace(/\./g, ""));
+        amountA = parseFloat(
+          moneyOfUser.user_value.replace(' VNĐ', '').replace(/\./g, '')
+        );
       }
     } catch (err: any) {
       console.error('Lỗi lấy Web A:', err?.response?.data || err.message);
     }
 
-    // Gọi Web B
+    // Lấy số dư Web B
     try {
       const resB: AxiosResponse<UserDataB> = await axios.get(this.apiUserWebRotatingProxy, {
         headers: {
-          'Api-token': this.apiUserWebRotatingProxy,
+          'Api-token': process.env.API_KEY_PROXY_ROTATING || '',
         },
       });
       amountB = resB.data?.data?.balance ?? null;
     } catch (err: any) {
       console.error('Lỗi lấy Web B:', err?.response?.data || err.message);
+      amountB = 0;
     }
 
-    // Soạn và gửi tin nhắn
-    const message: string = `🛒 *Có người vừa mua hàng*\n\n` +
-      `🌐 Web Ipv4 còn: *${amountA !== null ? amountA.toLocaleString() + ' VNĐ' : 'Lỗi'}*\n` +
-      `🌐 Web key Xoay còn: *${amountB !== null ? amountB.toLocaleString() + ' VNĐ' : 'Lỗi'}*`;
+    const formatCurrency = (amount: number | null) =>
+      amount !== null ? amount.toLocaleString() + ' VNĐ' : 'Lỗi';
 
-    await this.telegramNotifier.send(message);
+    let message: string;
+
+    switch (status) {
+      case 'success':
+        message =
+          `<b>✅ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thành công</b>\n` +
+          `Số lượng: <b>${quantity}</b>\n` +
+          `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
+          `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
+        break;
+
+      case 'error':
+        message =
+          `<b>❌ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thất bại</b>\n` +
+          `Số lượng: <b>${quantity}</b>\n` +
+          `Lỗi: <code>${errorMessage || 'Không xác định'}</code>\n` +
+          `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
+          `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
+        break;
+
+      case 'info':
+        message =
+          `<b>⚠️ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} cần kiểm tra</b>\n` +
+          `Số lượng: <b>${quantity}</b>\n` +
+          `Đơn hàng vượt giới hạn — vui lòng hỗ trợ gấp.\n` +
+          `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
+          `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
+        break;
+
+      default:
+        message =
+          `<b>ℹ️ Đơn hàng ${orderId} trạng thái không xác định</b>\n` +
+          `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
+          `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
+        break;
+    }
+    await this.telegramNotifier.send(message, { parse_mode: 'HTML' });
   }
 }
