@@ -31,7 +31,9 @@ export class StaticProxyService implements IStaticProxyService {
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
-            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+            return Array(quantity).fill({
+                product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+            });
         }
 
         const proxyType = StaticProxyTypeMapping[key];
@@ -40,25 +42,48 @@ export class StaticProxyService implements IStaticProxyService {
         }
 
         // hiện đang có lỗi làm timeout
-        if (proxyType == "US") {
-            return Array(quantity).fill({ product: `Đơn hàng: ${orderId} call API lỗi, shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+        if (proxyType === "US") {
+            return Array(quantity).fill({
+                product: `Đơn hàng: ${orderId} call API lỗi, shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+            });
         }
+
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
 
-        try {
-            const response = await axios.get(fullUrl, { httpsAgent: this.proxyAgent });
-            const proxyList = processProxyResponse(response.data);
-            this.notifier.notifyPurchase(false, orderId, quantity, "success").catch(err =>
-                console.error('Lỗi gửi thông báo info:', err)
-            );
-            return proxyList;
-        } catch (error) {
-            console.log("Lỗi:", error.message);
-            this.notifier.notifyPurchase(false, orderId, quantity, "error", error.message).catch(err =>
-                console.error('Lỗi gửi thông báo info:', err)
-            );
-            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call API lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
-        }
+        // Promise timeout 7.5 giây
+        const timeoutPromise = new Promise((resolve) => {
+            setTimeout(() => {
+                console.warn(`Timeout 7.5s cho order ${orderId}`);
+                this.notifier.notifyPurchase(false, orderId, quantity, "error", "Timeout 7.5s").catch(err =>
+                    console.error('Lỗi gửi thông báo info:', err)
+                );
+                resolve(Array(quantity).fill({
+                    product: `Mã đơn hàng: ${orderId} call API lỗi (timeout), liên hệ chủ shop để nhận sản phẩm và hỗ trợ`
+                }));
+            }, 7500);
+        });
+
+        const apiCallPromise = (async () => {
+            try {
+                const response = await axios.get(fullUrl, { httpsAgent: this.proxyAgent });
+                const proxyList = processProxyResponse(response.data);
+                this.notifier.notifyPurchase(false, orderId, quantity, "success").catch(err =>
+                    console.error('Lỗi gửi thông báo info:', err)
+                );
+                return proxyList;
+            } catch (error: any) {
+                console.log("Lỗi:", error.message);
+                this.notifier.notifyPurchase(false, orderId, quantity, "error", error.message).catch(err =>
+                    console.error('Lỗi gửi thông báo info:', err)
+                );
+                return Array(quantity).fill({
+                    product: `Mã đơn hàng: ${orderId} call API lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ`
+                });
+            }
+        })();
+
+        // Chạy race giữa API và timeout
+        return await Promise.race([apiCallPromise, timeoutPromise]);
     }
 
     async getAmountInventory(): Promise<any> {
@@ -88,32 +113,61 @@ export class StaticProxyService implements IStaticProxyService {
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
-            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+            return Array(quantity).fill({
+                product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+            });
         }
+
         const proxyType = StaticProxyTypeMapping[key];
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
 
-        if (proxyType == "US") {
-            return Array(quantity).fill({ product: `Đơn hàng: ${orderId} call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn` });
+        if (proxyType === "US") {
+            return Array(quantity).fill({
+                product: `Đơn hàng: ${orderId} call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+            });
         }
 
         const fullUrl = `${this.BASE_URL}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&type=${encodeURIComponent('SOCKS5')}&loaiproxy=${encodeURIComponent(proxyType)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
-        try {
-            const response = await axios.get(fullUrl, { httpsAgent: this.proxyAgent });
-            const proxyList = processProxyResponse(response.data);
-            this.notifier.notifyPurchase(false, orderId, quantity, "success").catch(err =>
-                console.error('Lỗi gửi thông báo info:', err)
-            );
-            return proxyList;
-        } catch (error) {
-            this.notifier.notifyPurchase(false, orderId, quantity, "error", error.message).catch(err =>
-                console.error('Lỗi gửi thông báo info:', err)
-            );
-            return Array(quantity).fill({ product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ` });
-        }
+
+        // Tạo promise timeout 7.5s
+        const timeoutPromise = new Promise((resolve) => {
+            setTimeout(() => {
+                console.warn(`Timeout 7.5s cho order ${orderId}`);
+                this.notifier.notifyPurchase(false, orderId, quantity, "error", "Timeout 7.5s").catch(err =>
+                    console.error('Lỗi gửi thông báo info:', err)
+                );
+                resolve(Array(quantity).fill({
+                    product: `Mã đơn hàng: ${orderId} call API lỗi (timeout), liên hệ chủ shop để nhận sản phẩm và hỗ trợ`
+                }));
+            }, 7500);
+        });
+
+        // Promise gọi API
+        const apiCallPromise = (async () => {
+            try {
+                const response = await axios.get(fullUrl, { httpsAgent: this.proxyAgent });
+                const proxyList = processProxyResponse(response.data);
+                this.notifier.notifyPurchase(false, orderId, quantity, "success").catch(err =>
+                    console.error('Lỗi gửi thông báo info:', err)
+                );
+                return proxyList;
+            } catch (error: any) {
+                console.error("Lỗi:", error.message);
+                this.notifier.notifyPurchase(false, orderId, quantity, "error", error.message).catch(err =>
+                    console.error('Lỗi gửi thông báo info:', err)
+                );
+                return Array(quantity).fill({
+                    product: `Mã đơn hàng: ${orderId} call api đang lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ`
+                });
+            }
+        })();
+
+        // Race giữa API và timeout
+        return await Promise.race([apiCallPromise, timeoutPromise]);
     }
+
 
     async getAmountInventorySocks5(): Promise<any> {
         return Promise.resolve({ sum: 335 });
