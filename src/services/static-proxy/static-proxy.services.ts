@@ -63,14 +63,14 @@ export class StaticProxyService implements IStaticProxyService {
                 timedOut = true;
                 resolved = true;
 
-                console.warn(`Timeout 7s cho order ${orderId}`);
+                console.warn(`Timeout 6.5s cho order ${orderId}`);
 
                 // gửi notify lỗi ngay (timeout)
-                notifyOnce("error", "Timeout 7s");
+                notifyOnce("error", "Timeout 6.5s");
 
                 // trả fallback cho client
-                resolve(buildErrorResult("call API lỗi (timeout), liên hệ chủ shop để nhận sản phẩm và hỗ trợ"));
-            }, 7000);
+                resolve(buildErrorResult("call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn"));
+            }, 6500);
 
             try {
                 // 2. gọi API bên A
@@ -117,7 +117,7 @@ export class StaticProxyService implements IStaticProxyService {
 
                 if (!resolved) {
                     resolved = true;
-                    resolve(buildErrorResult("call API lỗi, liên hệ chủ shop để nhận sản phẩm và hỗ trợ"));
+                    resolve(buildErrorResult("call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn"));
                 }
             }
         });
