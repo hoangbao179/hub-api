@@ -3,8 +3,8 @@ name: Build and Deploy hub-api
 on:
   push:
     branches:
-      - vps          # CI/CD chỉ chạy khi push vào nhánh vps
-  workflow_dispatch:
+      - vps          # Chạy CI/CD khi push lên nhánh vps
+  workflow_dispatch: # Cho phép chạy tay trong tab Actions
 
 jobs:
   build:
@@ -39,7 +39,7 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/hub-api:${{ github.sha }}
             ${{ secrets.DOCKER_USERNAME }}/hub-api:latest
-            
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -56,36 +56,36 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ssh_key.pem
           chmod 600 ssh_key.pem
 
-          # SSH sang VPS, truyền DOCKER_USERNAME / DOCKER_TAG vào env của shell
+          # SSH vào VPS, truyền DOCKER_USERNAME / DOCKER_TAG vào env của shell
           ssh -o StrictHostKeyChecking=no -i ssh_key.pem \
             "$VPS_USER@$VPS_IP" \
             DOCKER_USERNAME="$DOCKER_USERNAME" DOCKER_TAG="$DOCKER_TAG" << 'EOF'
             set -e
+            cd /opt/hub-api
 
-            cd /opt/hub-api   # thư mục deploy trên VPS
-
-            # Đọc tag hiện tại (nếu có)
+            # Lấy tag đang chạy hiện tại (nếu có)
             if [ -f .env ]; then
               CURRENT_DOCKER_TAG=$(grep '^DOCKER_TAG=' .env | cut -d '=' -f 2- || true)
             else
               CURRENT_DOCKER_TAG=""
             fi
 
-            # Dừng container cũ (nếu đang chạy)
-            docker compose down || true
+            echo "Current tag: $CURRENT_DOCKER_TAG"
+            echo "New tag:     $DOCKER_TAG"
 
-            # Xoá image cũ (nếu có)
-            if [ -n "$CURRENT_DOCKER_TAG" ]; then
-              docker rmi ${DOCKER_USERNAME}/hub-api:$CURRENT_DOCKER_TAG || true
-            fi
-
-            # Cập nhật .env cho docker-compose (không đụng app.env)
-            sed -i '/^DOCKER_USERNAME=/d' .env 2>/dev/null || true
-            sed -i '/^DOCKER_TAG=/d' .env 2>/dev/null || true
-            echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> .env
+            # Ghi .env với tag mới (commit id mới)
+            echo "DOCKER_USERNAME=${DOCKER_USERNAME}" > .env
             echo "DOCKER_TAG=${DOCKER_TAG}" >> .env
 
-            # Kéo image mới + chạy lại container
+            # Kéo image mới và chạy lại container
             docker compose pull hub-api
             docker compose up -d hub-api
+
+            # Xoá image cũ để tiết kiệm dung lượng (nếu khác tag mới)
+            if [ -n "$CURRENT_DOCKER_TAG" ] && [ "$CURRENT_DOCKER_TAG" != "$DOCKER_TAG" ]; then
+              echo "Removing old image: ${DOCKER_USERNAME}/hub-api:${CURRENT_DOCKER_TAG}"
+              docker image rm "${DOCKER_USERNAME}/hub-api:${CURRENT_DOCKER_TAG}" || true
+            else
+              echo "No old image to remove."
+            fi
           EOF
