@@ -140,7 +140,7 @@ export class StaticProxyService implements IStaticProxyService {
             `?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}` +
             `&loaiproxy=${encodeURIComponent(proxyType)}` +
             `&soluong=${encodeURIComponent(quantity)}` +
-            `&ngay=${encodeURIComponent(30)}`;
+            `&ngay=${encodeURIComponent(1)}`;
 
         // chạy core logic
         return await this.executePurchaseWithTimeout(
@@ -210,7 +210,7 @@ export class StaticProxyService implements IStaticProxyService {
             `&type=${encodeURIComponent('SOCKS5')}` +
             `&loaiproxy=${encodeURIComponent(proxyType)}` +
             `&soluong=${encodeURIComponent(quantity)}` +
-            `&ngay=${encodeURIComponent(30)}`;
+            `&ngay=${encodeURIComponent(1)}`;
 
         return await this.executePurchaseWithTimeout(
             orderId,
@@ -235,7 +235,7 @@ export class StaticProxyService implements IStaticProxyService {
             throw new Error('Invalid orderId provided');
         }
 
-        const fullUrl = `${this.BASE_URL_V6}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
+        const fullUrl = `${this.BASE_URL_V6}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(1)}`;
         try {
             const response = await axios.post(fullUrl, {});
             const proxyList = processProxyResponseV6(response.data);
