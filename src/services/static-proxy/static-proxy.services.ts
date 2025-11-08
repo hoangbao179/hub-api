@@ -42,21 +42,21 @@ export class StaticProxyService implements IStaticProxyService {
 
         // Trả về 1 Promise "điều phối"
         return await new Promise(async (resolve) => {
-            // 1. setup timeout 7s
+            // 1. setup timeout 5.5s
             const timeoutId = setTimeout(() => {
                 if (resolved) return; // đã resolve rồi thì không làm gì nữa
 
                 timedOut = true;
                 resolved = true;
 
-                console.warn(`Timeout 6s cho order ${orderId}`);
+                console.warn(`Timeout 5.5s cho order ${orderId}`);
 
                 // gửi notify lỗi ngay (timeout)
-                notifyOnce("error", "Timeout 6s");
+                notifyOnce("error", "Timeout 5.5s");
 
                 // trả fallback cho client
                 resolve(buildErrorResult("call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn"));
-            }, 6000);
+            }, 5500);
 
             try {
                 // 2. gọi API bên A
