@@ -1,4 +1,4 @@
-name: CI/CD to VPS (staging, env from GitHub)
+name: CI + CD hub-api (staging)
 
 on:
   push:
@@ -6,10 +6,36 @@ on:
       - staging    # chạy khi push/merge vào nhánh staging
 
 jobs:
-  build-and-deploy:
+  # ===== STAGE 1: CI - build/check code trên GitHub runner =====
+  ci:
     runs-on: ubuntu-latest
 
-    # Map GitHub Secrets -> env trong job
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build TypeScript
+        run: npm run build
+
+      # Sau này nếu có test thì bật thêm
+      # - name: Run tests
+      #   run: npm test
+
+  # ===== STAGE 2: CD - deploy lên VPS =====
+  deploy:
+    runs-on: ubuntu-latest
+    needs: ci              # chỉ chạy khi job ci SUCCESS
+
+    # Map GitHub Secrets -> env trong job deploy
     env:
       API_GET_INFO_USER: ${{ secrets.API_GET_INFO_USER }}
       API_KEY_PROXY_ROTATING: ${{ secrets.API_KEY_PROXY_ROTATING }}
@@ -33,16 +59,13 @@ jobs:
       USER_TOKEN_API_TH: ${{ secrets.USER_TOKEN_API_TH }}
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Deploy to VPS via SSH
+      - name: Deploy hub-api to VPS via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.VPS_IP }}          # bạn đang đặt tên secret là VPS_IP
-          username: ${{ secrets.VPS_USER }}    # secret VPS_USER
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # secret SSH_PRIVATE_KEY
-          port: 22                             # nếu sau này đổi port thì thêm secret VPS_PORT cũng được
+          host: ${{ secrets.VPS_IP }}          # IP VPS
+          username: ${{ secrets.VPS_USER }}    # user SSH
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # private key SSH
+          port: 22                             # nếu sau này đổi port thì sửa ở đây
 
           # forward các env app sang VPS
           envs: API_GET_INFO_USER,API_KEY_PROXY_ROTATING,API_KEY_SITE_BUY_PROXY,API_USER_WEB_ROTATING_PROXY,APP_INS_VERSION,GOOGLE_PRIVATE_KEY,GOOGLE_SERVICE_ACCOUNT_EMAIL,PROXY_VN_CALL_API,SHEET_ID,SHEET_NAME_INS,SITE_BUY_PROXY,SITE_SELL_GMAIL,SITE_SELL_PROXY,TELEGRAM_BOT_TOKEN,TELEGRAM_CHAT_ID,TEMP_MAIL_API_BASE,URL_BUY_PROXY_ROTATING,URL_GET_DATA_ROTATING_PROXY,URL_GET_PACKAGE_ROTATING_PROXY,USER_TOKEN_API_TH
