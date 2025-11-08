@@ -63,14 +63,14 @@ export class StaticProxyService implements IStaticProxyService {
                 timedOut = true;
                 resolved = true;
 
-                console.warn(`Timeout 6.5s cho order ${orderId}`);
+                console.warn(`Timeout 6s cho order ${orderId}`);
 
                 // gửi notify lỗi ngay (timeout)
-                notifyOnce("error", "Timeout 6.5s");
+                notifyOnce("error", "Timeout 6s");
 
                 // trả fallback cho client
                 resolve(buildErrorResult("call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn"));
-            }, 6500);
+            }, 6000);
 
             try {
                 // 2. gọi API bên A
@@ -141,6 +141,9 @@ export class StaticProxyService implements IStaticProxyService {
 
         // hiện đang có lỗi làm timeout
         if (proxyType === "US") {
+            this.notifier.notifyPurchase(true, orderId, quantity, "us_waiting").catch(err =>
+                console.error('Lỗi gửi thông báo info:', err)
+            );
             return Array(quantity).fill({
                 product: `Đơn hàng: ${orderId} call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });
@@ -206,6 +209,9 @@ export class StaticProxyService implements IStaticProxyService {
 
         // US vẫn chặn
         if (proxyType === "US") {
+            this.notifier.notifyPurchase(true, orderId, quantity, "us_waiting").catch(err =>
+                console.error('Lỗi gửi thông báo info:', err)
+            );
             return Array(quantity).fill({
                 product: `Đơn hàng: ${orderId} call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });

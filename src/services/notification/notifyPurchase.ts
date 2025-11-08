@@ -28,7 +28,7 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
     isRotating: boolean,
     orderId: string,
     quantity: number,
-    status: 'success' | 'error' | 'info' | string,
+    status: 'success' | 'error' | 'info' | 'us_waiting' |string,
     errorMessage?: any
   ): Promise<void> {
     let amountA: number | null = null;
@@ -83,6 +83,14 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
           `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
         break;
 
+      case 'us_waiting':
+        message =
+          `<b>❌ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thuộc case không xử lý có lẽ là proxy US </b>\n` +
+          `Số lượng: <b>${quantity}</b>\n` +
+          `Đơn hàng cần được hỗ trợ.\n` +
+          `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
+          `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
+        break;
       case 'info':
         message =
           `<b>⚠️ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} cần kiểm tra</b>\n` +
