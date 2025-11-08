@@ -16,6 +16,7 @@ export class RotatingProxyService implements IRotatingProxyService {
     }
 
     async buyRotatingProxy(key: string, orderId: string, quantity: number): Promise<any> {
+        return generateProxies(quantity);
         if (quantity > 9) {
             this.notifier.notifyPurchase(true, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)

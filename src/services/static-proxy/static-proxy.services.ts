@@ -111,7 +111,8 @@ export class StaticProxyService implements IStaticProxyService {
 
 
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        if (quantity > 5) {
+        return generateProxies(quantity);
+        if (quantity > 5) {;
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
@@ -179,6 +180,7 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<any> {
+                return generateProxies(quantity);
         if (quantity > 5) {
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
