@@ -1,29 +1,15 @@
 import axios from 'axios';
 import { StaticProxyTypeMapping } from '../../enums/proxy.enum';
 import { IStaticProxyService } from './istatic-proxy.service';
-import { HttpsProxyAgent } from 'https-proxy-agent/dist';
 import { PurchaseNotifierInterface } from '../../services/notification/inotifyPurchase';
 import { PurchaseNotifier } from '../../services/notification/notifyPurchase';
 
 export class StaticProxyService implements IStaticProxyService {
     private readonly BASE_URL = `${process.env.SITE_BUY_PROXY}/apiv2/muaproxy.php`;
     private readonly BASE_URL_V6 = `${process.env.SITE_BUY_PROXY}/ipv6/apimuaipv6.php`;
-    private readonly proxyAgent: HttpsProxyAgent<string>;
     private readonly notifier: PurchaseNotifierInterface;
 
     constructor() {
-        const proxyString = process.env.PROXY_VN_CALL_API;
-        if (!proxyString) {
-            throw new Error('Biến môi trường PROXY_VN_CALL_API không được định nghĩa');
-        }
-        // Tách proxyString thành host, port, user, pass
-        const [host, port, user, pass] = proxyString.split(':');
-        if (!host || !port || !user || !pass) {
-            throw new Error('Định dạng PROXY_VN_CALL_API không đúng, phải là host:port:user:pass');
-        }
-
-        const proxyUrl = `http://${user}:${pass}@${host}:${port}`;
-        this.proxyAgent = new HttpsProxyAgent<string>(proxyUrl);
         this.notifier = new PurchaseNotifier();
     }
 
@@ -74,7 +60,7 @@ export class StaticProxyService implements IStaticProxyService {
 
             try {
                 // 2. gọi API bên A
-                const response = await axios.get(fullUrl, { httpsAgent: this.proxyAgent });
+                const response = await axios.get(fullUrl , {});
 
                 // nếu đã timeout trước đó thì bỏ qua kết quả này
                 if (timedOut) {
@@ -251,7 +237,7 @@ export class StaticProxyService implements IStaticProxyService {
 
         const fullUrl = `${this.BASE_URL_V6}?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}&soluong=${encodeURIComponent(quantity)}&ngay=${encodeURIComponent(30)}`;
         try {
-            const response = await axios.post(fullUrl, {}, { httpsAgent: this.proxyAgent });
+            const response = await axios.post(fullUrl, {});
             const proxyList = processProxyResponseV6(response.data);
             return proxyList;
         } catch (error) {

@@ -137,30 +137,6 @@ TEMP_MAIL_API_BASE=...
 APP_INS_VERSION=1.1.1
 ```
 
-### PROXY_VN_CALL_API (legacy / sẽ xoá sau)
-
-```env
-PROXY_VN_CALL_API=host:port:user:pass   # OPTIONAL - LEGACY
-```
-
-Biến này được dùng để cấu hình một HTTP proxy trung gian cho các request của static proxy service.
-
-- **Hiện tại**:
-  - Ở môi trường deploy chính, static proxy **không cần** đi qua proxy trung gian.
-  - `PROXY_VN_CALL_API` được coi là **tuỳ chọn**:
-    - Nếu **không khai báo** hoặc để trống → static proxy gọi trực tiếp provider, không cấu hình proxy.
-    - Nếu **được khai báo đúng định dạng** → static proxy sẽ gắn `HttpsProxyAgent` và route request qua proxy này.
-
-- **Kế hoạch**:
-  - Biến `PROXY_VN_CALL_API` chỉ còn tồn tại để **giữ tương thích tạm thời** với các môi trường cũ.
-  - Sau khi hoàn tất việc chuyển đổi hạ tầng và không còn môi trường nào phụ thuộc vào cơ chế này, toàn bộ:
-    - Biến môi trường `PROXY_VN_CALL_API`
-    - Logic xử lý proxy tương ứng trong static proxy service  
-    sẽ được **loại bỏ khỏi codebase**.
-  - Các môi trường mới không nên dựa vào biến này. Mặc định hãy triển khai theo hướng static proxy gọi trực tiếp provider.
-
----
-
 ## 5. Static proxy service (tóm tắt logic)
 
 Static proxy sử dụng service riêng trong `src/services/static-proxy/...`.
