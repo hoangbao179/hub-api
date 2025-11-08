@@ -16,7 +16,6 @@ export class RotatingProxyService implements IRotatingProxyService {
     }
 
     async buyRotatingProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        return generateProxies(quantity);
         if (quantity > 9) {
             this.notifier.notifyPurchase(true, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
@@ -24,7 +23,7 @@ export class RotatingProxyService implements IRotatingProxyService {
             return Array(quantity).fill({ product: `Đơn hàng: ${orderId} đang order hơn 10 key, liên hệ shop hoặc tele: hateno17 để cấp key` });
         }
 
-        const proxyType = "CHANGE_PROXY_1_DAY";
+        const proxyType = RotatingProxyTypeMapping[key];
         if (!proxyType) {
             throw new Error('Invalid orderId provided');
         }
