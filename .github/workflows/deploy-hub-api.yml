@@ -9,6 +9,7 @@ jobs:
   # ===== STAGE 1: CI - build/check code trên GitHub runner =====
   ci:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -25,14 +26,16 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
+      # Sau này nếu có test thì bật thêm
       # - name: Run tests
       #   run: npm test
 
   # ===== STAGE 2: CD - deploy lên VPS =====
   deploy:
     runs-on: ubuntu-latest
-    needs: ci
+    needs: ci              # chỉ chạy khi job ci SUCCESS
 
+    # Map GitHub Secrets -> env trong job deploy
     env:
       API_GET_INFO_USER: ${{ secrets.API_GET_INFO_USER }}
       API_KEY_PROXY_ROTATING: ${{ secrets.API_KEY_PROXY_ROTATING }}
@@ -58,19 +61,23 @@ jobs:
       - name: Deploy hub-api to VPS via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          host: ${{ secrets.VPS_IP }}          # IP VPS
+          username: ${{ secrets.VPS_USER }}    # user SSH
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # private key SSH
+          port: 22                             # nếu sau này đổi port thì sửa ở đây
+
+          # forward các env app sang VPS
           envs: API_GET_INFO_USER,API_KEY_PROXY_ROTATING,API_KEY_SITE_BUY_PROXY,API_USER_WEB_ROTATING_PROXY,APP_INS_VERSION,GOOGLE_PRIVATE_KEY,GOOGLE_SERVICE_ACCOUNT_EMAIL,SHEET_ID,SHEET_NAME_INS,SITE_BUY_PROXY,SITE_SELL_GMAIL,SITE_SELL_PROXY,TELEGRAM_BOT_TOKEN,TELEGRAM_CHAT_ID,TEMP_MAIL_API_BASE,URL_BUY_PROXY_ROTATING,URL_GET_DATA_ROTATING_PROXY,URL_GET_PACKAGE_ROTATING_PROXY,USER_TOKEN_API_TH
+
           script: |
             set -e
             cd /opt/hub-api
 
-            # Lấy code mới nhất từ nhánh staging
+            # Đồng bộ code với origin/staging, ĐÈ hết mọi thay đổi local
             git fetch origin
             git checkout staging
-            git pull origin staging
+            git reset --hard origin/staging
+            git clean -fd
 
             # Ghi lại file .env từ GitHub Secrets
             cat > .env << EOF
@@ -98,8 +105,5 @@ jobs:
             # Build & restart container
             docker compose up -d --build
 
-            # ----- Cleanup an toàn: xoá dangling images (không dùng) -----
+            # Dọn image không dùng
             docker image prune -f
-
-            # (tuỳ chọn) Dọn cache Builder cho nhẹ disk:
-            # docker builder prune -f
