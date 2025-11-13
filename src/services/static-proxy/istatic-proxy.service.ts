@@ -5,10 +5,6 @@ export interface IStaticProxyService {
 
     getAmountInventory(): Promise<any>;
 
-    buyStaticProxyV6(key: string, orderId: string, quantity: number): Promise<IStaticProxy>;
-
-    getAmountInventoryV6(): Promise<any>;
-
     buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<IStaticProxy>;
 
     getAmountInventorySocks5(): Promise<any>;

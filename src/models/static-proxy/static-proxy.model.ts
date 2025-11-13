@@ -11,3 +11,9 @@ export interface IStaticProxy {
     time: Date
   }
   
+/** Kiểu trả về thống nhất cho service */
+export interface FulfillmentRenderResult {
+  statusCode: number;
+  contentType: string; // 'text/plain' hiện tại (giữ ngỏ cho JSON nếu cần)
+  body: string;
+}
