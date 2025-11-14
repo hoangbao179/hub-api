@@ -24,11 +24,11 @@ class FulfillmentServiceImpl implements IFulfillmentService {
 
     const order = orders[0] as { id: number; status: string; created_at: Date };
 
-    // 2) Hết hạn 24 giờ
+    // 2) Hết hạn quá 1 tháng 
     const created = new Date(order.created_at);
-    const isExpired = Date.now() - created.getTime() > 24 * 60 * 60 * 1000;
+    const isExpired = Date.now() - created.getTime() > 24 * 30 * 60 * 60 * 1000;
     if (isExpired) {
-      return { statusCode: 410, contentType: 'text/plain', body: 'Link đã hết hạn (quá 24 giờ). Vui lòng tạo đơn mới.' };
+      return { statusCode: 410, contentType: 'text/plain', body: 'Link đã hết hạn (quá 30 ngày). Vui lòng tạo đơn mới.' };
     }
 
     // 3) Lấy proxies đã có
@@ -59,7 +59,7 @@ class FulfillmentServiceImpl implements IFulfillmentService {
     }
 
     // FAILED (hoặc trạng thái khác)
-    return { statusCode: 200, contentType: 'text/plain', body: 'Đơn hàng lỗi, vui lòng liên hệ hỗ trợ.' };
+    return { statusCode: 200, contentType: 'text/plain', body: 'Đơn hàng lỗi, vui lòng liên hệ qua tele: hateno17 để hỗ trợ (đổi name/pass của proxy, đổi HTTP qua SOCKS5...)' };
 
   }
 }

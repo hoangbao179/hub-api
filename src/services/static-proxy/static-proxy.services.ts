@@ -16,12 +16,12 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        if (quantity > 5) {
+        if (quantity > 50) {
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
             return Array(quantity).fill({
-                product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+                product: `Mã đơn hàng: ${orderId} đang order hơn 50 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });
         }
 
@@ -31,7 +31,7 @@ export class StaticProxyService implements IStaticProxyService {
         }
 
         // hiện đang có lỗi làm timeout
-        if (proxyType === "US") {
+        if (proxyType === "US" && quantity > 20) {
             this.notifier.notifyPurchase(true, orderId, quantity, "us_waiting").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
@@ -75,7 +75,7 @@ export class StaticProxyService implements IStaticProxyService {
             .catch(err => console.error('[staticProxyService] background error', err));
 
         // trả message kèm link (1 dòng, không ngoặc kép để khỏi bị \")
-        const message = `Vui lòng truy cập link ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
+        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 5 phút vì sever đang xử lý proxy cho bạn`;
         return Array.from({ length: quantity }).map(() => ({ product: message }));
 
     }
@@ -154,12 +154,12 @@ export class StaticProxyService implements IStaticProxyService {
      * Giống buyStaticProxy nhưng URL có thêm type=SOCKS5.
      */
     async buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<any> {
-        if (quantity > 5) {
+        if (quantity > 50) {
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
             return Array(quantity).fill({
-                product: `Mã đơn hàng: ${orderId} đang order hơn 5 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+                product: `Mã đơn hàng: ${orderId} đang order hơn 50 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });
         }
 
@@ -169,7 +169,7 @@ export class StaticProxyService implements IStaticProxyService {
         }
 
         // US vẫn chặn như cũ
-        if (proxyType === "US") {
+        if (proxyType === "US" && quantity > 20) {
             this.notifier.notifyPurchase(true, orderId, quantity, "us_waiting").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
@@ -210,7 +210,7 @@ export class StaticProxyService implements IStaticProxyService {
         this.processOrderInBackgroundFromUrl(orderId, fullUrl, (raw) => processProxyResponse(raw))
             .catch(err => console.error('[staticProxyService] background error', err));
 
-        const message = `Vui lòng truy cập link ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
+        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 5 phút vì sever đang xử lý proxy cho bạn`;
         return Array.from({ length: quantity }).map(() => ({ product: message }));
     }
 
