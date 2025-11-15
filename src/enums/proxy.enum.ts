@@ -16,6 +16,8 @@ export const StaticProxyTypeMapping: Record<string, string> = {
     "238c3e13-a4df-41af-b760-aa70a63c0fb1": "FPT",
     "c238ce00-9123-4428-8990-46eee8e3d2ff": "VNPT",
     "5acc02b2-c068-4d70-9b3c-1af5bcbdb688": "VNPT",
+    "6d45ede9-4b71-463e-92fa-83b6576bf043": "VNPT",
+    "56244254-73f0-4c8e-8ec9-6c1df02d5b06": "VNPT",
     "aa8884d8-1592-4ff3-bb16-7f2e752dce9e": "US",
     "fb73eaf1-77aa-44eb-8a14-b0bd8fadacfc": "US",
     "55ad9b89-aaa9-48a1-a450-aa87f902e9de": "US",

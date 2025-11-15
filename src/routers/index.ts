@@ -5,6 +5,7 @@ import rotatingProxyRouter from './rotating-proxy.router';
 import licenseInstaRouter from './license-ins.route';
 import licenseEmailRouter from './license-email.router';
 import fulfillmentRouter from './fulfillment.router';
+import memberRouter from './member.router';
 
 const router = Router();
 router.use('/proxy', proxyRouter);
@@ -13,4 +14,5 @@ router.use('/gmail', gmailRouter);
 router.use("/license-insta", licenseInstaRouter);
 router.use("/email", licenseEmailRouter);
 router.use("/fulfillments", fulfillmentRouter);
+router.use("/member", memberRouter);   
 export default router;

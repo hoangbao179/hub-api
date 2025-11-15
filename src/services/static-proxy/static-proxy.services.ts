@@ -40,13 +40,20 @@ export class StaticProxyService implements IStaticProxyService {
             });
         }
 
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, "0");     
+        const month = String(today.getMonth() + 1).padStart(2, "0"); 
+        const namePass = `proxy${day}${month}`;
+
         // URL mua hàng (HTTP)
         const fullUrl =
             `${this.BASE_URL}` +
             `?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}` +
             `&loaiproxy=${encodeURIComponent(proxyType)}` +
             `&soluong=${encodeURIComponent(quantity)}` +
-            `&ngay=${encodeURIComponent(1)}`;
+            `&ngay=${encodeURIComponent(1)}` + 
+            `&user=${encodeURIComponent(namePass)}` +
+            `&password=${encodeURIComponent(namePass)}`;
 
         // Idempotency: nếu đã có order cùng external_order_id → dùng lại (và đảm bảo result_token = orderId)
         const [exist] = await dbPool.query(
@@ -75,7 +82,7 @@ export class StaticProxyService implements IStaticProxyService {
             .catch(err => console.error('[staticProxyService] background error', err));
 
         // trả message kèm link (1 dòng, không ngoặc kép để khỏi bị \")
-        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 5 phút vì sever đang xử lý proxy cho bạn`;
+        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
         return Array.from({ length: quantity }).map(() => ({ product: message }));
 
     }
@@ -178,14 +185,19 @@ export class StaticProxyService implements IStaticProxyService {
             });
         }
 
-
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, "0");     
+        const month = String(today.getMonth() + 1).padStart(2, "0"); 
+        const namePass = `proxy${day}${month}`;
         const fullUrl =
             `${this.BASE_URL}` +
             `?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}` +
             `&type=${encodeURIComponent('SOCKS5')}` +
             `&loaiproxy=${encodeURIComponent(proxyType)}` +
             `&soluong=${encodeURIComponent(quantity)}` +
-            `&ngay=${encodeURIComponent(1)}`;
+            `&ngay=${encodeURIComponent(1)}` +
+            `&user=${encodeURIComponent(namePass)}` +
+            `&password=${encodeURIComponent(namePass)}`;
 
         const [exist] = await dbPool.query(
             'SELECT result_token FROM orders WHERE external_order_id = ? ORDER BY id DESC LIMIT 1',
@@ -210,12 +222,24 @@ export class StaticProxyService implements IStaticProxyService {
         this.processOrderInBackgroundFromUrl(orderId, fullUrl, (raw) => processProxyResponse(raw))
             .catch(err => console.error('[staticProxyService] background error', err));
 
-        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 5 phút vì sever đang xử lý proxy cho bạn`;
+        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
         return Array.from({ length: quantity }).map(() => ({ product: message }));
     }
 
     async getAmountInventorySocks5(): Promise<any> {
         return Promise.resolve({ sum: 335 });
+    }
+
+        /**
+     * Cho phép service khác (ví dụ MemberProxyService) dùng chung luồng xử lý nền
+     * để gọi vendor & lưu proxy vào DB.
+     */
+    public async enqueueStaticProxyOrder(externalOrderId: string, fullUrl: string): Promise<void> {
+        await this.processOrderInBackgroundFromUrl(
+            externalOrderId,
+            fullUrl,
+            (raw) => processProxyResponse(raw)
+        );
     }
 }
 
@@ -325,3 +349,4 @@ function generateProxies(quantity: number) {
         product: randomProxy()
     }));
 }
+

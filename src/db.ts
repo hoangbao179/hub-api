@@ -7,7 +7,7 @@ export async function initDatabase(): Promise<void> {
   const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
 
   if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_NAME) {
-    console.error('[DB] Missing DB env config (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)');
+    console.error('[DB] Missing DB env config (DB_HOST, DB_PORT, DB_PASSWORD, DB_NAME)');
     process.exit(1);
   }
 
@@ -46,6 +46,7 @@ async function createSchema(pool: mysql.Pool): Promise<void> {
   const createOrdersTable = `
     CREATE TABLE IF NOT EXISTS orders (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      member_id BIGINT UNSIGNED NULL,
       external_order_id VARCHAR(100) NOT NULL,
       result_token VARCHAR(191) NOT NULL UNIQUE,
       loaiproxy VARCHAR(50) NOT NULL,
@@ -56,7 +57,8 @@ async function createSchema(pool: mysql.Pool): Promise<void> {
       error_message VARCHAR(255) NULL,
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_external_order_id (external_order_id)
+      INDEX idx_external_order_id (external_order_id),
+      INDEX idx_member_id (member_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`;
 
   const createProxiesTable = `
@@ -74,6 +76,28 @@ async function createSchema(pool: mysql.Pool): Promise<void> {
       INDEX idx_expired_at (expired_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`;
 
+  const createMembersTable = `
+    CREATE TABLE IF NOT EXISTS members (
+      id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      \`key\` VARCHAR(32) NOT NULL UNIQUE,
+      name VARCHAR(191) NOT NULL,
+      allocation INT NOT NULL DEFAULT 0,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`;
+
   await pool.query(createOrdersTable);
   await pool.query(createProxiesTable);
+  await pool.query(createMembersTable);
+
+  // Đảm bảo cột member_id tồn tại trong bảng orders (cho DB cũ)
+  try {
+    await pool.query(`
+      ALTER TABLE orders
+      ADD COLUMN member_id BIGINT UNSIGNED NULL AFTER id,
+      ADD INDEX idx_member_id (member_id)
+    `);
+  } catch (e) {
+    // bỏ qua nếu cột đã tồn tại
+  }
 }

@@ -29,7 +29,8 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
     orderId: string,
     quantity: number,
     status: 'success' | 'error' | 'info' | 'us_waiting' |string,
-    errorMessage?: any
+    errorMessage?: any,
+    scope: 'mmo' | 'member' = 'mmo',
   ): Promise<void> {
     let amountA: number | null = null;
     let amountB: number | null = null;
@@ -64,11 +65,11 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
       amount !== null ? amount.toLocaleString() + ' VNĐ' : 'Lỗi';
 
     let message: string;
-
+    const prefix = scope === 'member' ? '[Người dùng call api ngoài]' : '[MMO]';
     switch (status) {
       case 'success':
         message =
-          `<b>✅ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thành công</b>\n` +
+          `${prefix} <b>✅ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thành công</b>\n` +
           `Số lượng: <b>${quantity}</b>\n` +
           `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
           `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
@@ -76,7 +77,7 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
 
       case 'error':
         message =
-          `<b>❌ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thất bại</b>\n` +
+          `${prefix} <b>❌ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thất bại</b>\n` +
           `Số lượng: <b>${quantity}</b>\n` +
           `Lỗi: <code>${errorMessage || 'Không xác định'}</code>\n` +
           `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
@@ -85,7 +86,7 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
 
       case 'us_waiting':
         message =
-          `<b>❌ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thuộc case không xử lý có lẽ là proxy US </b>\n` +
+          `${prefix} <b>❌ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} thuộc case không xử lý có lẽ là proxy US </b>\n` +
           `Số lượng: <b>${quantity}</b>\n` +
           `Đơn hàng cần được hỗ trợ.\n` +
           `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
@@ -93,7 +94,7 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
         break;
       case 'info':
         message =
-          `<b>⚠️ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} cần kiểm tra</b>\n` +
+          `${prefix} <b>⚠️ Đơn hàng ${isRotating ? 'Key xoay' : 'Proxy tĩnh'} mã ${orderId} cần kiểm tra</b>\n` +
           `Số lượng: <b>${quantity}</b>\n` +
           `Đơn hàng vượt giới hạn — vui lòng hỗ trợ gấp.\n` +
           `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
@@ -102,7 +103,7 @@ export class PurchaseNotifier implements PurchaseNotifierInterface {
 
       default:
         message =
-          `<b>ℹ️ Đơn hàng ${orderId} trạng thái không xác định</b>\n` +
+          `${prefix} <b>ℹ️ Đơn hàng ${orderId} trạng thái không xác định</b>\n` +
           `Web Ipv4 còn: <b>${formatCurrency(amountA)}</b>\n` +
           `Web key Xoay còn: <b>${formatCurrency(amountB)}</b>`;
         break;
