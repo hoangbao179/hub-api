@@ -55,7 +55,7 @@ class FulfillmentServiceImpl implements IFulfillmentService {
 
     // PENDING / PROCESSING
     if (order.status === 'PENDING' || order.status === 'PROCESSING') {
-      return { statusCode: 200, contentType: 'text/plain', body: 'Đang cấu hình proxy, vui lòng truy cập lại sau.' };
+      return { statusCode: 200, contentType: 'text/plain', body: 'Đang cấu hình proxy, vui lòng chờ một chút rồi truy cập lại.' };
     }
 
     // FAILED (hoặc trạng thái khác)

@@ -16,12 +16,12 @@ export class StaticProxyService implements IStaticProxyService {
     }
 
     async buyStaticProxy(key: string, orderId: string, quantity: number): Promise<any> {
-        if (quantity > 50) {
+        if (quantity > 100) {
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
             return Array(quantity).fill({
-                product: `Mã đơn hàng: ${orderId} đang order hơn 50 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+                product: `Mã đơn hàng: ${orderId} đang order hơn 100 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });
         }
 
@@ -31,12 +31,12 @@ export class StaticProxyService implements IStaticProxyService {
         }
 
         // hiện đang có lỗi làm timeout
-        if (proxyType === "US" && quantity > 20) {
+        if (proxyType === "US" && quantity > 50) {
             this.notifier.notifyPurchase(true, orderId, quantity, "us_waiting").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
             return Array(quantity).fill({
-                product: `Đơn hàng: ${orderId} call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+                product: `Đơn hàng: ${orderId} đang order hơn 50 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });
         }
 
@@ -51,7 +51,7 @@ export class StaticProxyService implements IStaticProxyService {
             `?key=${encodeURIComponent(process.env.API_KEY_SITE_BUY_PROXY)}` +
             `&loaiproxy=${encodeURIComponent(proxyType)}` +
             `&soluong=${encodeURIComponent(quantity)}` +
-            `&ngay=${encodeURIComponent(1)}` + 
+            `&ngay=${encodeURIComponent(30)}` + 
             `&user=${encodeURIComponent(namePass)}` +
             `&password=${encodeURIComponent(namePass)}`;
 
@@ -161,12 +161,12 @@ export class StaticProxyService implements IStaticProxyService {
      * Giống buyStaticProxy nhưng URL có thêm type=SOCKS5.
      */
     async buyStaticProxySocks5(key: string, orderId: string, quantity: number): Promise<any> {
-        if (quantity > 50) {
+        if (quantity > 100) {
             this.notifier.notifyPurchase(false, orderId, quantity, "info").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
             return Array(quantity).fill({
-                product: `Mã đơn hàng: ${orderId} đang order hơn 50 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+                product: `Mã đơn hàng: ${orderId} đang order hơn 100 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });
         }
 
@@ -176,12 +176,12 @@ export class StaticProxyService implements IStaticProxyService {
         }
 
         // US vẫn chặn như cũ
-        if (proxyType === "US" && quantity > 20) {
+        if (proxyType === "US" && quantity > 50) {
             this.notifier.notifyPurchase(true, orderId, quantity, "us_waiting").catch(err =>
                 console.error('Lỗi gửi thông báo info:', err)
             );
             return Array(quantity).fill({
-                product: `Đơn hàng: ${orderId} call API lỗi, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
+                product: `Đơn hàng: ${orderId} đang order hơn 50 proxy, liên hệ shop hoặc tele: hateno17 để nhận proxy có name pass theo ý bạn`
             });
         }
 
@@ -195,7 +195,7 @@ export class StaticProxyService implements IStaticProxyService {
             `&type=${encodeURIComponent('SOCKS5')}` +
             `&loaiproxy=${encodeURIComponent(proxyType)}` +
             `&soluong=${encodeURIComponent(quantity)}` +
-            `&ngay=${encodeURIComponent(1)}` +
+            `&ngay=${encodeURIComponent(30)}` +
             `&user=${encodeURIComponent(namePass)}` +
             `&password=${encodeURIComponent(namePass)}`;
 
