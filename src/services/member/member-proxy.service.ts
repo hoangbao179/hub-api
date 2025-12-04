@@ -234,7 +234,7 @@ export class MemberProxyService {
 
       // 11) Build link fulfill trả cho member
       const fulfillmentUrl = buildFulfillmentUrlWithOrderId(orderId);
-      const message = `Vui lòng truy cập link: ${fulfillmentUrl} sau 2 - 5 phút vì sever đang xử lý proxy cho bạn`;
+      const message = `Vui lòng truy cập link này để nhận proxy: ${fulfillmentUrl} sau 2 - 5 phút vì sever đang xử lý proxy cho bạn`;
 
       return message;
     } catch (err: any) {

@@ -41,7 +41,7 @@ class FulfillmentServiceImpl implements IFulfillmentService {
 
     // 4) Render theo trạng thái
     if (order.status === 'SUCCESS') {
-      const thankYou = 'cám ơn bạn đã mua ủng hộ, cần gì cứ liên hệ qua tele: hateno17 để hỗ trợ (đổi name/pass của proxy, đổi HTTP qua SOCKS5...)';
+      const thankYou = 'Cám ơn bạn đã mua ủng hộ mình, cần gì cứ liên hệ qua tele: hateno17 để hỗ trợ (đổi name/pass của proxy, đổi HTTP qua SOCKS5...)';
       const body = [...active, thankYou].join('\n');
       return { statusCode: 200, contentType: 'text/plain', body };
     }

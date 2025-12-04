@@ -82,7 +82,7 @@ export class StaticProxyService implements IStaticProxyService {
             .catch(err => console.error('[staticProxyService] background error', err));
 
         // trả message kèm link (1 dòng, không ngoặc kép để khỏi bị \")
-        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
+        const message = `Vui lòng truy cập link này để nhận proxy: ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
         return Array.from({ length: quantity }).map(() => ({ product: message }));
 
     }
@@ -222,7 +222,7 @@ export class StaticProxyService implements IStaticProxyService {
         this.processOrderInBackgroundFromUrl(orderId, fullUrl, (raw) => processProxyResponse(raw))
             .catch(err => console.error('[staticProxyService] background error', err));
 
-        const message = `Vui lòng truy cập link: ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
+        const message = `Vui lòng truy cập link này để nhận proxy: ${resultUrl} sau 1 - 3 phút vì sever đang xử lý proxy cho bạn`;
         return Array.from({ length: quantity }).map(() => ({ product: message }));
     }
 
